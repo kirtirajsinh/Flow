@@ -1,0 +1,15 @@
+{
+    "name": "Flow",
+    "description": "Simplifying taking Notes and collaborating with peers",
+    "version": "1.0",
+    "manifest_version": 3,
+    "permissions":[
+      "activeTab"
+    ],
+    "background":{
+      "service_worker": "background.js"
+    },
+    "action":{
+      "default_popup":"popup.html"
+    }
+ }
