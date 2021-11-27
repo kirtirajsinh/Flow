@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 
  const firebaseConfig = {
@@ -12,10 +13,11 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 }
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 const auth = getAuth();
 
-export {provider, auth}
+export {provider, auth , db};
 export default app;
 
 

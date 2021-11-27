@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react'
 import {signInWithPopup, signOut, onAuthStateChanged} from 'firebase/auth'
-import {auth, provider} from "../firebase"
-import {useNavigate,useLocation, Navigate} from 'react-router-dom'
+import {auth, provider , db} from "../firebase"
+import {useNavigate} from 'react-router-dom'
+import { collection, setDoc , getDocs, Timestamp  } from "firebase/firestore";
 
-export const AuthContext = React.createContext();
+
+const AuthContext = React.createContext();
 
 export const AuthProvider = ({children}) => {
     const authenticate = useProvideAuth();
@@ -18,15 +20,32 @@ export const useAuth = () => {
   const useProvideAuth = () => {
       let navigate = useNavigate();
       const [user,setUser] = useState(null);
+      // const currentUser = auth.currentUser
       
       const signin = () => {
           return signInWithPopup(auth, provider)
-          .then((userDetails) =>{
+          .then( async (userDetails) =>{
                   console.log(userDetails)
                   const user = userDetails.user;
                     setUser(user);
-                  navigate("/home", { replace: true });
-          }).catch(error => console.error(error))
+                    const querySnapshot = await getDocs(collection(db, "users"));
+                    console.log(querySnapshot)
+                    querySnapshot.forEach((doc) => {
+                        if(doc.data().uid !== user.uid){
+                          console.log(doc.data().uid)
+                            setDoc(collection(db, "users", user.uid), {
+                                name: user.displayName,
+                                photo: user.photoURL,
+                                createdAt: Timestamp.fromDate(new Date())
+                            })
+                        }
+                    })
+                    navigate("/home", { replace: true });
+                    });
+                    
+                 
+          
+        
       }
 
       const signout = () => {
@@ -36,25 +55,22 @@ export const useAuth = () => {
            
           }).catch((error) => {
             // An error happened.
+            console.error(error);
           });
       }
 
       useEffect(() => {
        const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-              // User is signed in, see docs for a list of available properties
-              // https://firebase.google.com/docs/reference/js/firebase.User
               setUser(user);
-          
-              const uid = user.uid;
-              // ...
             } else {
-              // User is signed out
-              // ...
+              
+              setUser(null);
             }
           });
           return () => unsubscribe();
       },[]);
+     
 
       return {
         user,
