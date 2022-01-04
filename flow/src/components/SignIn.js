@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import { useAuth } from './AuthContext';
-import { useNavigate } from 'react-router-dom';
+
 
 const SignIn = () => {
-    let navigate = useNavigate();
+    
 let auth = useAuth();
 
 return (
